@@ -9036,7 +9036,7 @@
     });
   }
   d3.svg.brush = function() {
-    var event = d3_eventDispatch(brush, "brushstart", "brush", "brushend"), x = null, y = null, xExtent = [ 0, 0 ], yExtent = [ 0, 0 ], xExtentDomain, yExtentDomain, xClamp = true, yClamp = true, resizes = d3_svg_brushResizes[0];
+    var event = d3_eventDispatch(brush, "brushstart", "brush", "brushend"), x = null, y = null, xExtent = [ 0, 0 ], yExtent = [ 0, 0 ], xExtentDomain, yExtentDomain, xClamp = true, yClamp = true, resizes = d3_svg_brushResizes[0], extent_type_points = true;
     function brush(g) {
       g.each(function() {
         var g = d3.select(this).style("pointer-events", "all").style("-webkit-tap-highlight-color", "rgba(0,0,0,0)").on("mousedown.brush", brushstart).on("touchstart.brush", brushstart);
@@ -9282,7 +9282,8 @@
             if (y1 < y0) t = y0, y0 = y1, y1 = t;
           }
         }
-        return x && y ? [ [ x0, y0 ], [ x1, y1 ] ] : x ? [ x0, x1 ] : y && [ y0, y1 ];
+        var ext = x && y ? [ [ x0, y0 ], [ x1, y1 ] ] : x ? [ x0, x1 ] : y ? [ y0, y1 ] : null;
+        return !extent_type_points ? x && y ? [ [ ext[0][0], ext[1][0] ], [ ext[0][1], ext[1][1] ] ] : ext : ext;
       }
       if (x) {
         x0 = z[0], x1 = z[1];
@@ -9311,6 +9312,18 @@
     };
     brush.empty = function() {
       return !!x && xExtent[0] == xExtent[1] || !!y && yExtent[0] == yExtent[1];
+    };
+    brush.type = function() {
+      if (!arguments.length) {
+        return extent_type_points ? "points" : "ranges";
+      }
+      if (arguments[0] == "points") {
+        extent_type_points = true;
+      }
+      if (arguments[0] == "ranges") {
+        extent_type_points = false;
+      }
+      return brush;
     };
     return d3.rebind(brush, event, "on");
   };
