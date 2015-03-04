@@ -371,7 +371,8 @@ d3.svg.brush = function() {
           if (y1 < y0) t = y0, y0 = y1, y1 = t;
         }
       }
-      return (x && y) ? [[x0, y0], [x1, y1]] : x ? [x0, x1] : y ? [y0, y1] : null 
+      var ext = (x && y) ? [[x0, y0], [x1, y1]] : x ? [x0, x1] : y ? [y0, y1] : null
+      return !extent_type_points ? (x && y) ? [[ext[0][0], ext[1][0]], [ext[0][1], ext[1][1]]] : ext : ext
     }
 
     // Scale the data-space extent to pixels.
