@@ -18,7 +18,8 @@ d3.svg.brush = function() {
       yExtentDomain, // y-extent in data space
       xClamp = true, // whether to clamp the x-extent to the range
       yClamp = true, // whether to clamp the y-extent to the range
-      resizes = d3_svg_brushResizes[0];
+      resizes = d3_svg_brushResizes[0],
+      extent_type_points = true
 
   function brush(g) {
     g.each(function() {
@@ -370,7 +371,7 @@ d3.svg.brush = function() {
           if (y1 < y0) t = y0, y0 = y1, y1 = t;
         }
       }
-      return x && y ? [[x0, y0], [x1, y1]] : x ? [x0, x1] : y && [y0, y1];
+      return (x && y) ? [[x0, y0], [x1, y1]] : x ? [x0, x1] : y ? [y0, y1] : null 
     }
 
     // Scale the data-space extent to pixels.
@@ -406,6 +407,22 @@ d3.svg.brush = function() {
     return !!x && xExtent[0] == xExtent[1]
         || !!y && yExtent[0] == yExtent[1];
   };
+
+  brush.type = function(){
+    if (!arguments.length){
+      return extent_type_points ? 'points' : 'ranges'
+    }
+
+    if (arguments[0] == 'points'){
+      extent_type_points = true
+    }
+    if (arguments[0] == 'ranges'){
+      extent_type_points = false
+    }
+
+    return brush
+
+  }
 
   return d3.rebind(brush, event, "on");
 };
